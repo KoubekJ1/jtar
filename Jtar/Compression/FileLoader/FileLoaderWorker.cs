@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text;
 using Jtar.Logging;
 
 namespace Jtar.Compression.FileLoader;
@@ -19,7 +20,9 @@ public class FileLoaderWorker
             {
                 string filepath = _filepaths.Take();
                 Logger.Log(LogType.Debug, $"FileLoaderWorker {Environment.CurrentManagedThreadId} received: " + filepath);
-                // Process the file at 'filepath'
+                var tarStream = new MemoryStream();
+                
+                
             }
             catch (InvalidOperationException)
             {
