@@ -7,7 +7,7 @@ namespace Jtar.Compression.FileLoader;
 
 public class FileLoaderWorker
 {
-    private const long MAX_CHUNK_SIZE_BYTES = 128 * 1024; // 128 KB
+    private const long MAX_CHUNK_SIZE_BYTES = 128 * 1024; // 128 KB (limit set by the zstd specification)
 
     private readonly BlockingCollection<string> _filepaths;
     private readonly FileTarFormatter _fileTarFormatter;
@@ -21,7 +21,7 @@ public class FileLoaderWorker
 
     public void Run()
     {
-        while (_filepaths.Count > 0 || !_filepaths.IsCompleted)
+        while (!_filepaths.IsCompleted)
         {
             try
             {
@@ -40,6 +40,11 @@ public class FileLoaderWorker
                     var chunk = new Chunk(filepath, i, totalChunks, chunkData);
 
                     _outputCollection.Add(chunk);
+                }
+
+                if (_filepaths.IsCompleted && _filepaths.Count <= 0)
+                {
+                    _outputCollection.CompleteAdding();
                 }
             }
             catch (InvalidOperationException)

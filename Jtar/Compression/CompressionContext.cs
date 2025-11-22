@@ -31,5 +31,6 @@ public class CompressionContext
         Logger.Log(LogType.Debug, "Starting compression process...");
         _fileSeekerManager.Run();
         _fileLoaderManager.Run();
+        _chunkCompressorManager.Run();
     }
 }

@@ -22,7 +22,7 @@ public class ChunkCompressorWorker
 
     public void Run()
     {
-        while (_chunks.Count > 0 || !_chunks.IsCompleted)
+        while (!_chunks.IsCompleted)
         {
             try
             {
