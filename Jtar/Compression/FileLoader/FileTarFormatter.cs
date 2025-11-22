@@ -9,9 +9,16 @@ public class FileTarFormatter
         
     }
 
-    public void FormatTar(string path, Stream outputStream)
+    public byte[] FormatTar(string path)
     {
-        
+        var fileBytes = File.ReadAllBytes(path);
+        var fileLength = fileBytes.Length;
+        var padding = 512 - (fileLength % 512);
+        byte[] data = new byte[512 + fileLength + padding];
+        CreateTarHeader(path, data);
+        if (fileBytes.Length > 0) fileBytes.CopyTo(data, 512);
+
+        return data;
     }
 
     private void WriteOctal(byte[] header, long value, int offset, int length)
@@ -20,41 +27,40 @@ public class FileTarFormatter
         Encoding.ASCII.GetBytes(octal).CopyTo(header, offset);
     }
 
-    private void CreateTarHeader(string path, Stream outputStream)
+    private void CreateTarHeader(string path, byte[] data)
     {
-        byte[] header = new byte[512];
+        if (data.Length < 512)
+            throw new ArgumentException("Data array must be at least 512 bytes long.");
 
         string name = Path.GetFileName(path);
         long size = new FileInfo(path).Length;
         long mtime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        Encoding.ASCII.GetBytes(name).CopyTo(header, 0); // file name
-        WriteOctal(header, Convert.ToInt32("644", 8), 100, 8);     // mode
-        WriteOctal(header, 0, 108, 8);         // uid
-        WriteOctal(header, 0, 116, 8);         // gid
-        WriteOctal(header, size, 124, 12);     // size
-        WriteOctal(header, mtime, 136, 12);    // mtime
+        Encoding.ASCII.GetBytes(name).CopyTo(data, 0); // file name
+        WriteOctal(data, Convert.ToInt32("644", 8), 100, 8);     // mode
+        WriteOctal(data, 0, 108, 8);         // uid
+        WriteOctal(data, 0, 116, 8);         // gid
+        WriteOctal(data, size, 124, 12);     // size
+        WriteOctal(data, mtime, 136, 12);    // mtime
 
         // type flag: '0' = file
-        header[156] = (byte)'0';
+        data[156] = (byte)'0';
 
         // magic "ustar"
-        Encoding.ASCII.GetBytes("ustar").CopyTo(header, 257);
+        Encoding.ASCII.GetBytes("ustar").CopyTo(data, 257);
 
         // checksum field: fill with spaces first
         for (int i = 148; i < 156; i++)
-            header[i] = 0x20;
+            data[i] = 0x20;
 
         // compute checksum
         int chk = 0;
-        foreach (byte b in header)
+        foreach (byte b in data)
             chk += b;
 
         string chkOct = Convert.ToString(chk, 8).PadLeft(6, '0');
-        Encoding.ASCII.GetBytes(chkOct).CopyTo(header, 148);
-        header[154] = 0;
-        header[155] = (byte)' ';
-
-        outputStream.Write(header, 0, header.Length);
+        Encoding.ASCII.GetBytes(chkOct).CopyTo(data, 148);
+        data[154] = 0;
+        data[155] = (byte)' ';
     }
 }
