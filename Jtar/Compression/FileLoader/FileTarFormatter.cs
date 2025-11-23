@@ -13,7 +13,8 @@ public class FileTarFormatter
     {
         var fileBytes = File.ReadAllBytes(path);
         var fileLength = fileBytes.Length;
-        var padding = 512 - (fileLength % 512);
+        var remainder = fileLength % 512;
+        var padding = remainder > 0 ? 512 - remainder : 0;
         byte[] data = new byte[512 + fileLength + padding];
         CreateTarHeader(path, data);
         if (fileBytes.Length > 0) fileBytes.CopyTo(data, 512);
@@ -56,8 +57,8 @@ public class FileTarFormatter
 
         // compute checksum
         int chk = 0;
-        foreach (byte b in data)
-            chk += b;
+        for (int i = 0; i < 512; i++)
+            chk += data[i];
 
         string chkOct = Convert.ToString(chk, 8).PadLeft(6, '0');
         Encoding.ASCII.GetBytes(chkOct).CopyTo(data, 148);

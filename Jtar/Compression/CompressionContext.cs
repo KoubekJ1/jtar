@@ -18,13 +18,13 @@ public class CompressionContext
     private readonly FileLoaderManager _fileLoaderManager;
     private readonly FileSeekerManager _fileSeekerManager;
 
-    public CompressionContext(int threadCount, IEnumerable<string> inputFiles, string outputFile)
+    public CompressionContext(int threadCount, IEnumerable<string> inputFiles, string outputFile, ICompressor? compressor = null)
     {
         _threadCount = threadCount;
         _inputFiles = inputFiles;
         _outputFile = outputFile;
 
-        ICompressor compressor = new ZstdCompressor();
+        compressor = compressor ?? new NoCompressor();
     
         _fileOutputManager = new FileOutputManager(compressor, new FileStream(_outputFile, FileMode.Create, FileAccess.Write));
         _chunkCompressorManager = new ChunkCompressorManager(Math.Max(1, threadCount-3), compressor, _fileOutputManager.Chunks);

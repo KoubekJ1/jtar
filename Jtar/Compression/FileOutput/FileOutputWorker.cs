@@ -84,6 +84,7 @@ public class FileOutputWorker
         Logger.Log(LogType.Debug, $"FileOutputWorker {Environment.CurrentManagedThreadId} writing file: " + chunks.First().Filepath);
         foreach (var chunk in chunks)
         {
+            //Logger.Log(LogType.Debug, $"FileOutputWorker {Environment.CurrentManagedThreadId} writing data {string.Join(",", chunk.Data)}");
             _outputStream.Write(chunk.Data, 0, chunk.Data.Length);
         }
     }

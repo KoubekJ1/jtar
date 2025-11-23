@@ -12,7 +12,7 @@ class Program
         Compression.CompressionContextBuilder builder = new Compression.CompressionContextBuilder();
         Compression.CompressionContext context = builder
             .SetInputFiles(new string[] { "obj" })
-            .SetOutputFile("output.tar.zstd")
+            .SetOutputFile("output.tar")
             .SetThreadCount(11)
             .Build();
 
