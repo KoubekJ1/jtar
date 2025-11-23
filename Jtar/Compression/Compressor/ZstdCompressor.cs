@@ -1,3 +1,5 @@
+using ZstdNet;
+
 namespace Jtar.Compression.Compressor;
 
 public class ZstdCompressor : ICompressor
@@ -6,7 +8,7 @@ public class ZstdCompressor : ICompressor
     private readonly ZstdNet.Decompressor _decompressor;
     public ZstdCompressor()
     {
-        _compressor = new ZstdNet.Compressor();
+        _compressor = new ZstdNet.Compressor(new CompressionOptions(CompressionOptions.MaxCompressionLevel));
         _decompressor = new ZstdNet.Decompressor();
     }
 
