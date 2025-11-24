@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using Jtar.Compression.FileSeeker;
+using Jtar.Logging;
 
 [TestClass]
 public class FileSeekerWorkerTests
@@ -11,10 +12,12 @@ public class FileSeekerWorkerTests
     public void Run_EmitsFilesFromDirectory()
     {
         // Arrange – create a temp dir with some files
-        string tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        //string tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string tempDir = "temp";
         Directory.CreateDirectory(tempDir);
         try
         {
+            Logger.ShowDebugMessages = true;
             string file1 = Path.Combine(tempDir, "file1.txt");
             string file2 = Path.Combine(tempDir, "file2.txt");
             File.WriteAllText(file1, "hello");
@@ -28,11 +31,19 @@ public class FileSeekerWorkerTests
 
             var seeker = new FileSeekerWorker(dirQueue, outputQueue);
 
-            // Act – run the fucker
             seeker.Run();
+
+            var files = Directory.GetFiles(tempDir);
+            foreach (var file in files)
+            {
+                Console.WriteLine(file);
+            }
 
             // Assert – outputQueue should contain the files
             var filesFound = outputQueue.ToList();
+            /*var a = outputQueue.Take();
+            Console.WriteLine($"a: {a}");*/
+            Console.WriteLine($"Files found: {string.Join(", ", filesFound)}");
             CollectionAssert.Contains(filesFound, file1);
             CollectionAssert.Contains(filesFound, file2);
             Assert.AreEqual(2, filesFound.Count, "Expected exactly 2 files in the output queue.");

@@ -39,8 +39,8 @@ public class FileLoaderWorkerTests
                 .SelectMany(c => c.Data)
                 .ToArray();
 
-            // TAR prepends 512 bytes header, padding etc.
-            Assert.AreEqual(fileData.Length + 512, combined.Length, "Chunked data size mismatch.");
+            // TAR prepends 512 bytes header, padding etc. + our data + padding to 1024 bytes
+            Assert.AreEqual(1024, combined.Length, "Chunked data size mismatch.");
 
             // Check that our original file data is somewhere in the merged chunks
             CollectionAssert.AreEqual(fileData, combined.Skip(512).Take(fileData.Length).ToArray());
