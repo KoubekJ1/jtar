@@ -11,10 +11,6 @@ public class FileTarFormatter
 
     public byte[] FormatTar(string path)
     {
-        // Ensure path is in the correct format
-        path = Path.GetRelativePath(".", path);
-        path = path.Replace("\\", "/");
-
         var fileBytes = File.ReadAllBytes(path);
         var fileLength = fileBytes.Length;
         var remainder = fileLength % 512;
@@ -37,10 +33,14 @@ public class FileTarFormatter
         if (data.Length < 512)
             throw new ArgumentException("Data array must be at least 512 bytes long.");
 
+        // Ensure path is in the correct format
+        path = Path.GetRelativePath(".", path);
+        path = path.Replace("\\", "/");
+
         string name = path;
         var fileInfo = new FileInfo(path);
         long size = fileInfo.Length;
-        long mtime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        long mtime = new DateTimeOffset(File.GetLastWriteTimeUtc(path)).ToUnixTimeSeconds();
 
         Encoding.ASCII.GetBytes(name).CopyTo(data, 0); // file name
         WriteOctal(data, Convert.ToInt32("644", 8), 100, 8);     // mode
