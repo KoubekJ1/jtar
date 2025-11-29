@@ -34,7 +34,7 @@ public class FileTarFormatter
             throw new ArgumentException("Data array must be at least 512 bytes long.");
 
         //string name = Path.GetFileName(path);
-        string name = path;
+        string name = path.Replace("\\", "/");
         var fileInfo = new FileInfo(path);
         long size = fileInfo.Length;
         //long mtime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
