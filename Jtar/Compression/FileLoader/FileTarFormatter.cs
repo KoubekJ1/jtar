@@ -13,7 +13,7 @@ public class FileTarFormatter
     {
         // Ensure path is in the correct format
         path = Path.GetRelativePath(".", path);
-        Console.WriteLine(path);
+        path = path.Replace("\\", "/");
 
         var fileBytes = File.ReadAllBytes(path);
         var fileLength = fileBytes.Length;
