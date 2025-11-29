@@ -93,8 +93,11 @@ class Program
 
             try
             {
+                Logger.Log(LogType.Info, $"Creating archive: {outputName}");
                 var context = builder.Build();
                 await context.Compress();
+                Logger.Log(LogType.Info, $"Archive created: {outputName}");
+
             }
             catch (InvalidOutputFileException e)
             {
