@@ -1,15 +1,13 @@
-using ZstdNet;
-
 namespace Jtar.Compression.Compressor;
 
 public class ZstdCompressor : ICompressor
 {
-    private readonly ZstdNet.Compressor _compressor;
-    private readonly ZstdNet.Decompressor _decompressor;
+    private readonly ZstdSharp.Compressor _compressor;
+    private readonly ZstdSharp.Decompressor _decompressor;
     public ZstdCompressor()
     {
-        _compressor = new ZstdNet.Compressor(new CompressionOptions(CompressionOptions.MaxCompressionLevel));
-        _decompressor = new ZstdNet.Decompressor();
+        _compressor = new ZstdSharp.Compressor(ZstdSharp.Compressor.MaxCompressionLevel);
+        _decompressor = new ZstdSharp.Decompressor();
     }
 
     ~ZstdCompressor()
@@ -25,11 +23,11 @@ public class ZstdCompressor : ICompressor
 
     public byte[] Compress(byte[] data)
     {
-        return _compressor.Wrap(data);
+        return _compressor.Wrap(data).ToArray();
     }
 
     public byte[] Decompress(byte[] data)
     {
-        return _decompressor.Unwrap(data);
+        return _decompressor.Unwrap(data).ToArray();
     }
 }
