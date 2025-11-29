@@ -9,14 +9,14 @@ public class FileTarFormatter
         
     }
 
-    public byte[] FormatTar(string path)
+    public byte[] FormatTar(string path, string rootDir)
     {
         var fileBytes = File.ReadAllBytes(path);
         var fileLength = fileBytes.Length;
         var remainder = fileLength % 512;
         var padding = remainder > 0 ? 512 - remainder : 0;
         byte[] data = new byte[512 + fileLength + padding];
-        CreateTarHeader(path, data);
+        CreateTarHeader(path, rootDir, data);
         if (fileBytes.Length > 0) fileBytes.CopyTo(data, 512);
 
         return data;
@@ -28,19 +28,22 @@ public class FileTarFormatter
         Encoding.ASCII.GetBytes(octal).CopyTo(header, offset);
     }
 
-    private void CreateTarHeader(string path, byte[] data)
+    private void CreateTarHeader(string path, string rootDir, byte[] data)
     {
         if (data.Length < 512)
             throw new ArgumentException("Data array must be at least 512 bytes long.");
 
         // Ensure path is in the correct format
-        path = Path.GetRelativePath(".", path);
+        path = Path.GetRelativePath(rootDir, path);
         path = path.Replace("\\", "/");
 
         string name = path;
-        var fileInfo = new FileInfo(path);
+        var fileInfo = new FileInfo($"{rootDir}/{path}");
         long size = fileInfo.Length;
-        long mtime = new DateTimeOffset(File.GetLastWriteTimeUtc(path)).ToUnixTimeSeconds();
+        long mtime = new DateTimeOffset(File.GetLastWriteTimeUtc($"{rootDir}/{path}")).ToUnixTimeSeconds();
+
+        //var prefix;
+        //var actualName;
 
         Encoding.ASCII.GetBytes(name).CopyTo(data, 0); // file name
         WriteOctal(data, Convert.ToInt32("644", 8), 100, 8);     // mode

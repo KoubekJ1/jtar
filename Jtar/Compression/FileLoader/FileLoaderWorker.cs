@@ -28,7 +28,7 @@ public class FileLoaderWorker
                 string filepath = _filepaths.Take();
                 Logger.Log(LogType.Debug, $"FileLoaderWorker {Environment.CurrentManagedThreadId} received: " + filepath);
                 
-                var data = _fileTarFormatter.FormatTar(filepath);
+                var data = _fileTarFormatter.FormatTar(filepath, ".");
 
                 int totalChunks = (int)Math.Ceiling((double)data.Length / MAX_CHUNK_SIZE_BYTES);
                 for (int i = 0; i < totalChunks; i++)

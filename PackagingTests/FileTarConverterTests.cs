@@ -22,7 +22,7 @@ public class FileTarFormatterTests
         byte[] fileData = { 1, 2, 3 };
         string path = CreateTempFile(fileData, DateTime.Now);
 
-        var tar = formatter.FormatTar(path);
+        var tar = formatter.FormatTar(path, Path.GetTempPath());
 
         int expectedRemainder = fileData.Length % 512;
         int expectedPadding = expectedRemainder == 0 ? 0 : 512 - expectedRemainder;
@@ -38,7 +38,7 @@ public class FileTarFormatterTests
         byte[] fileData = Encoding.ASCII.GetBytes("HELLO");
         string path = CreateTempFile(fileData, DateTime.Now);
 
-        var tar = formatter.FormatTar(path);
+        var tar = formatter.FormatTar(path, Path.GetTempPath());
 
         for (int i = 0; i < fileData.Length; i++)
         {
@@ -53,7 +53,7 @@ public class FileTarFormatterTests
         byte[] fileData = new byte[1234];
         string path = CreateTempFile(fileData, DateTime.Now);
 
-        var tar = formatter.FormatTar(path);
+        var tar = formatter.FormatTar(path, Path.GetTempPath());
 
         string sizeField = Encoding.ASCII.GetString(tar, 124, 12).TrimEnd('\0', ' ');
         string expectedOctal = Convert.ToString(1234, 8).PadLeft(11, '0');
@@ -69,7 +69,7 @@ public class FileTarFormatterTests
         byte[] content = new byte[] { 10, 20, 30, 40 };
         string path = CreateTempFile(content, DateTime.Now);
 
-        var tar = formatter.FormatTar(path);
+        var tar = formatter.FormatTar(path, Path.GetTempPath());
 
         // Extract checksum from TAR header
         string chkField = Encoding.ASCII.GetString(tar, 148, 6).Trim('\0', ' ');
@@ -99,11 +99,46 @@ public class FileTarFormatterTests
         byte[] data = { 1, 2, 3 };
         string path = CreateTempFile(data, DateTime.Now);
 
-        var tar = formatter.FormatTar(path);
+        var tar = formatter.FormatTar(path, Path.GetTempPath());
 
         string nameField = Encoding.ASCII.GetString(tar, 0, 100).Trim('\0');
 
         // your code writes whole path, not just filename
-        Assert.AreEqual(path, nameField);
+        Assert.AreEqual(Path.GetFileName(path), nameField, $"{path} does not match {nameField}");
+    }
+
+    [TestMethod]
+    public void FormatTar_FileNameLongerThan300Characters_ShouldNotThrow()
+    {
+        // Arrange
+        var formatter = new FileTarFormatter();
+        string longName = new string('a', 251) + ".txt";
+        string filePath = Path.Combine(Path.GetTempPath(), longName);
+
+        // Ensure the directory exists
+        Directory.CreateDirectory(Path.GetTempPath());
+
+        // Create a small test file
+        File.WriteAllText(filePath, "test-data");
+
+        try
+        {
+            // Act
+            byte[] result = formatter.FormatTar(filePath, Path.GetTempPath());
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Length >= 512, "TAR entry must be at least 512 bytes.");
+
+            // Optional deeper checks
+            string nameField = Encoding.ASCII.GetString(result, 0, 300);
+            Assert.IsTrue(nameField.Contains("aaa"), "Name field should contain beginning of long filename.");
+        }
+        finally
+        {
+            // Cleanup
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
     }
 }
