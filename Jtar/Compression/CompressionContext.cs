@@ -3,6 +3,7 @@ using Jtar.Compression.Compressor;
 using Jtar.Compression.FileLoader;
 using Jtar.Compression.FileOutput;
 using Jtar.Compression.FileSeeker;
+using Jtar.Exceptions;
 using Jtar.Logging;
 
 namespace Jtar.Compression;
@@ -26,6 +27,14 @@ public class CompressionContext
 
         compressor = compressor ?? new NoCompressor();
     
+        if (Directory.Exists(outputFile))
+        {
+            throw new InvalidOutputFileException("Output file path is an existing directory!");
+        }
+        if (!Directory.Exists(Directory.GetParent(_outputFile)?.ToString()))
+        {
+            throw new InvalidOutputFileException("Output file directory does not exist!");
+        }
         _fileOutputManager = new FileOutputManager(compressor, new FileStream(_outputFile, FileMode.Create, FileAccess.Write));
         _chunkCompressorManager = new ChunkCompressorManager(Math.Max(1, threadCount-3), compressor, _fileOutputManager.Chunks);
         _fileLoaderManager = new FileLoaderManager(_chunkCompressorManager.Chunks);

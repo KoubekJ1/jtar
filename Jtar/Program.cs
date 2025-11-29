@@ -1,7 +1,9 @@
 ﻿using System.CommandLine;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Jtar.Compression;
 using Jtar.Compression.Compressor;
+using Jtar.Exceptions;
 using Jtar.Logging;
 
 namespace Jtar;
@@ -51,10 +53,21 @@ class Program
                 return 1;
             }
             Logger.ShowDebugMessages = parseResult.GetValue(debugOption);
-            Compression.CompressionContextBuilder builder = new CompressionContextBuilder();
+            CompressionContextBuilder builder = new CompressionContextBuilder();
             builder.SetInputFiles(files);
 
-            var outputName = files.First() + ".tar";
+            string outputName = "";
+            foreach (var file in files)
+            {
+                if (!File.Exists(file) && !Directory.Exists(file))
+                    continue;
+                outputName = file + ".tar";
+            }
+            if (string.IsNullOrWhiteSpace(outputName))
+            {
+                Logger.Log(LogType.Error, "All input files are invalid!");
+                return 1;
+            }
             var isCompression = !parseResult.GetValue(noCompressionOption);
             ICompressor compressor;
             if (isCompression)
@@ -76,8 +89,22 @@ class Program
 
             builder.SetOutputFile(outputName);
 
-            var context = builder.Build();
-            await context.Compress();
+            try
+            {
+                var context = builder.Build();
+                await context.Compress();
+            }
+            catch (InvalidOutputFileException e)
+            {
+                Logger.Log(LogType.Error, e.Message);
+                return 1;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, "An unknown error occured!");
+                Logger.Log(LogType.Debug, e.ToString());
+                return 1;
+            }
             return 0;
         }
         return 1;

@@ -27,6 +27,11 @@ public class FileSeekerWorker
             try
             {
                 var path = _pathQueue.Take();
+                if (Path.IsPathRooted(path))
+                {
+                    Logger.Log(LogType.Error, "Path must not be an absolute path!");
+                    continue;
+                }
                 if (!Path.Exists(path))
                 {
                     Logger.Log(LogType.Error, $"Path does not exist: {path}");
