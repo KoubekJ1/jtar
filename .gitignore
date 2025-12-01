@@ -1,15 +1,15 @@
-Jtar/bin
-Jtar/obj
-global.json
+jtar/Jtar/bin
+jtar/Jtar/obj
+jtar/global.json
 
-PackagingTests/bin
-PackagingTests/obj
+jtar/PackagingTests/bin
+jtar/PackagingTests/obj
 
-Decompressor/bin
-Decompressor/obj
+jtar/Decompressor/bin
+jtar/Decompressor/obj
 
-*.zstd
-*.tar
+jtar/*.zstd
+jtar/*.tar
 
 *.DS_Store
 *.vscode
