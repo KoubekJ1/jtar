@@ -64,7 +64,14 @@ Program byl realizován v jazyce C# pomocí .NET 8.0 SDK s velikým důrazem na 
 - FileLoader: Načítání nalezených souborů, vytvoření TAR hlaviček a rozdělení souborů na bloky (chunky)
 - ChunkCompressor: Komprese načtených bloků (chunků) pomocí specifikovaného algoritmu
 - FileOutput: Zápis zkomprimovaných bloků (chunků) ve vhodném pořadí do výsledného souboru
-<p>Všechny tyto procesy jsou spojeny pomocí třídy CompressionContext, která orchestruje veškeré konané činnosti.</p>
+
+Každá vrstva má svojí manager třídu a worker třídu. Manager třída tvoří instance worker třídy.
+
+Worker třídy používají pro komunikaci s ostatními komponentami vláknově bezpečné kolekce.
+
+<p>Všechny manager objekty jsou použity ve třídě CompressionContext, která orchestruje veškeré konané činnosti.
+
+CompressionContext spouští činnosti na každé úrovni asynchronně.</p>
 
 ### Použité knihovny třetích stran
 - ZstdSharp (oleg-st): https://github.com/oleg-st/ZstdSharp
