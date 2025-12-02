@@ -3,17 +3,28 @@ using Jtar.Logging;
 
 namespace Jtar.Compression.FileSeeker;
 
+/// <summary>
+/// Worker class responsible for seeking files in given directories and adding them to the output queue.
+/// </summary>
 public class FileSeekerWorker
 {
     private readonly BlockingCollection<string> _pathQueue;
     private readonly BlockingCollection<string> _outputQueue;
 
+    /// <summary>
+    /// Initializes a new instance of the FileSeekerWorker class.
+    /// </summary>
+    /// <param name="directoryQueue">Input file paths to search</param>
+    /// <param name="outputQueue">Queue to output found file paths into</param>
     public FileSeekerWorker(BlockingCollection<string> directoryQueue, BlockingCollection<string> outputQueue)
     {
         _pathQueue = directoryQueue;
         _outputQueue = outputQueue;
     }
 
+    /// <summary>
+    /// Starts the file seeking process.
+    /// </summary>
     public void Run()
     {
         while (!_pathQueue.IsCompleted)

@@ -3,6 +3,9 @@ using Jtar.Compression.Compressor;
 
 namespace Jtar.Compression.ChunkCompressor;
 
+/// <summary>
+/// Manages multiple chunk compressor workers for parallel compression.
+/// </summary>
 public class ChunkCompressorManager
 {
     public BlockingCollection<Chunk> Chunks { get; private set; }
@@ -10,6 +13,12 @@ public class ChunkCompressorManager
     private readonly BlockingCollection<Chunk> _outputCollection;
     private readonly ICompressor _compressor;
 
+    /// <summary>
+    /// Initializes a new instance of the ChunkCompressorManager class.
+    /// </summary>
+    /// <param name="workerCount">Amount of simultaneous threads to use</param>
+    /// <param name="compressor">Compressor to use for chunk compression</param>
+    /// <param name="outputCollection">Collection to output compressed chunks into</param>
     public ChunkCompressorManager(int workerCount, ICompressor compressor, BlockingCollection<Chunk> outputCollection)
     {
         Chunks = new BlockingCollection<Chunk>(new ConcurrentQueue<Chunk>(), 800); // 800 chunks ... 100 MB
@@ -18,6 +27,9 @@ public class ChunkCompressorManager
         _compressor = compressor;
     }
 
+    /// <summary>
+    /// Starts the chunk compressor workers.
+    /// </summary>
     public async Task Run()
     {
         Task[] tasks = new Task[_workerCount];

@@ -4,13 +4,25 @@ using Jtar.Logging;
 
 namespace Jtar.Compression.FileLoader;
 
+/// <summary>
+/// Formats files into USTAR tar format.
+/// </summary>
 public class FileTarFormatter
 {
+    /// <summary>
+    /// Initializes a new instance of the FileTarFormatter class.
+    /// </summary>
     public FileTarFormatter()
     {
 
     }
 
+    /// <summary>
+    /// Formats a file into USTAR tar format.
+    /// </summary>
+    /// <param name="path">Input filepath</param>
+    /// <param name="rootDir">Root directory set in the TAR header</param>
+    /// <returns>Byte array representing the file in USTAR tar format</returns>
     public byte[] FormatTar(string path, string rootDir)
     {
         var fileBytes = File.ReadAllBytes(path);
@@ -24,12 +36,27 @@ public class FileTarFormatter
         return data;
     }
 
+    /// <summary>
+    /// Writes a long value as an octal string into the specified header byte array.
+    /// </summary>
+    /// <param name="header">Array to output data into</param>
+    /// <param name="value">Value to write as octal</param>
+    /// <param name="offset">Index offset to write octal data to</param>
+    /// <param name="length">Length of the octal string</param>
     private void WriteOctal(byte[] header, long value, int offset, int length)
     {
         string octal = Convert.ToString(value, 8).PadLeft(length - 1, '0');
         Encoding.ASCII.GetBytes(octal).CopyTo(header, offset);
     }
 
+    /// <summary>
+    /// Creates a USTAR tar header for the specified file path.
+    /// </summary>
+    /// <param name="path">Input filepath</param>
+    /// <param name="rootDir">Root directory set in the header</param>
+    /// <param name="data">Byte array to write the header into</param>
+    /// <exception cref="ArgumentException">In case the array is less than 512 bytes long</exception>
+    /// <exception cref="PathTooLongException">In case the path name is too long</exception>
     private void CreateTarHeader(string path, string rootDir, byte[] data)
     {
         if (data.Length < 512)

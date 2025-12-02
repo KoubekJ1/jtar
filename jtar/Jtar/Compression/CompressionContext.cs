@@ -19,6 +19,14 @@ public class CompressionContext
     private readonly FileLoaderManager _fileLoaderManager;
     private readonly FileSeekerManager _fileSeekerManager;
 
+    /// <summary>
+    /// Initializes a new instance of the CompressionContext class.
+    /// </summary>
+    /// <param name="threadCount">Amount of threads used</param>
+    /// <param name="inputFiles">Files/Directories to be compressed</param>
+    /// <param name="outputFile">Output file path</param>
+    /// <param name="compressor">Compressor to use for compressing chunks</param>
+    /// <exception cref="InvalidOutputFileException"></exception>
     public CompressionContext(int threadCount, IEnumerable<string> inputFiles, string outputFile, ICompressor? compressor = null)
     {
         _threadCount = threadCount;
@@ -41,6 +49,9 @@ public class CompressionContext
         _fileSeekerManager = new FileSeekerManager(_inputFiles, _fileLoaderManager.Filepaths);
     }
 
+    /// <summary>
+    /// Starts the compression process.
+    /// </summary>
     public async Task Compress()
     {
         Logger.Log(LogType.Debug, "Starting compression process...");

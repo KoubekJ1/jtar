@@ -5,6 +5,10 @@ using Jtar.Logging;
 
 namespace Jtar.Compression.FileOutput;
 
+/// <summary>
+/// Worker responsible for writing chunks to the output stream
+/// Files are only written once all their chunks have been received
+/// </summary>
 public class FileOutputWorker
 {
     private readonly BlockingCollection<Chunk> _chunks;
@@ -13,6 +17,12 @@ public class FileOutputWorker
     private readonly Dictionary<string, List<Chunk>> _fileChunks = new Dictionary<string, List<Chunk>>();
     private readonly ICompressor _compressor;
 
+    /// <summary>
+    /// Initializes a new instance of the FileOutputWorker class.
+    /// </summary>
+    /// <param name="chunks"></param>
+    /// <param name="compressor"></param>
+    /// <param name="outputStream"></param>
     public FileOutputWorker(BlockingCollection<Chunk> chunks, ICompressor compressor, Stream outputStream)
     {
         _chunks = chunks;
@@ -20,6 +30,10 @@ public class FileOutputWorker
         _outputStream = outputStream;
     }
 
+    /// <summary>
+    /// Runs the file output worker, processing chunks and writing them to the output stream.
+    /// </summary>
+    /// <exception cref="InvalidDataException">In case the input chunks have inconsistent metadata</exception>
     public void Run()
     {
         // TODO: Write file exactly where it belongs in the final file
@@ -68,6 +82,10 @@ public class FileOutputWorker
         _outputStream.Write(compressedEnd, 0, compressedEnd.Length);
     }
 
+    /// <summary>
+    /// Writes the chunks of a file to the output stream in order.
+    /// </summary>
+    /// <param name="chunks">Chunks to write</param>
     private void WriteChunks(List<Chunk> chunks)
     {
         Logger.Log(LogType.Debug, $"FileOutputWorker {Environment.CurrentManagedThreadId} writing file: " + chunks.First().Filepath);

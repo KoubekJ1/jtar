@@ -5,6 +5,10 @@ using Jtar.Logging;
 
 namespace Jtar.Compression.FileLoader;
 
+/// <summary>
+/// Worker that loads files, formats them into tar format, splits them into chunks, and adds them to the output collection.
+/// Files are read from the filepaths collection assigned in the constructor.
+/// </summary>
 public class FileLoaderWorker
 {
     private const long MAX_CHUNK_SIZE_BYTES = 128 * 1024; // 128 KB (limit set by the zstd specification)
@@ -19,6 +23,9 @@ public class FileLoaderWorker
         _outputCollection = outputCollection;
     }
 
+    /// <summary>
+    /// Runs the file loading worker.
+    /// </summary>
     public void Run()
     {
         while (!_filepaths.IsCompleted)
