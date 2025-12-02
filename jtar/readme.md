@@ -73,7 +73,7 @@ Worker třídy používají pro komunikaci s ostatními komponentami vláknově 
 
 CompressionContext spouští činnosti na každé úrovni asynchronně.</p>
 
-![Class diagram](/docs/classes.png "Class diagram")
+![Class diagram](https://github.com/KoubekJ1/portfolio/blob/main/jtar/docs/classes.jpg "Class diagram")
 
 ### Použité knihovny třetích stran
 - ZstdSharp (oleg-st): https://github.com/oleg-st/ZstdSharp
