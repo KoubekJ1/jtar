@@ -11,14 +11,16 @@ public class FileLoaderManager
 {
     public BlockingCollection<string> Filepaths { get; } = new BlockingCollection<string>(new ConcurrentQueue<string>());
     private readonly BlockingCollection<Chunk> _outputCollection;
+    private readonly ITarFormatter _tarFormatter;
 
     /// <summary>
     /// Initializes a new instance of the FileLoaderManager class.
     /// </summary>
     /// <param name="outputCollection">Collection to add loaded chunks to</param>
-    public FileLoaderManager(BlockingCollection<Chunk> outputCollection)
+    public FileLoaderManager(BlockingCollection<Chunk> outputCollection, ITarFormatter? tarFormatter = null)
     {
         _outputCollection = outputCollection;
+        _tarFormatter = tarFormatter ?? new PaxTarFormatter();
     }
 
     /// <summary>

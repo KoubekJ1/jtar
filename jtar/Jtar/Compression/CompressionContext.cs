@@ -18,6 +18,7 @@ public class CompressionContext
     private readonly ChunkCompressorManager _chunkCompressorManager;
     private readonly FileLoaderManager _fileLoaderManager;
     private readonly FileSeekerManager _fileSeekerManager;
+    private readonly ITarFormatter _tarFormatter;
 
     /// <summary>
     /// Initializes a new instance of the CompressionContext class.
@@ -27,13 +28,14 @@ public class CompressionContext
     /// <param name="outputFile">Output file path</param>
     /// <param name="compressor">Compressor to use for compressing chunks</param>
     /// <exception cref="InvalidOutputFileException"></exception>
-    public CompressionContext(int threadCount, IEnumerable<string> inputFiles, string outputFile, ICompressor? compressor = null)
+    public CompressionContext(int threadCount, IEnumerable<string> inputFiles, string outputFile, ICompressor? compressor = null, ITarFormatter? tarFormatter = null)
     {
         _threadCount = threadCount;
         _inputFiles = inputFiles;
         _outputFile = outputFile;
 
         compressor = compressor ?? new NoCompressor();
+        _tarFormatter = tarFormatter ?? new PaxTarFormatter();
     
         if (Directory.Exists(outputFile))
         {

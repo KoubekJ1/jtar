@@ -7,12 +7,12 @@ namespace Jtar.Compression.FileLoader;
 /// <summary>
 /// Formats files into USTAR tar format.
 /// </summary>
-public class FileTarFormatter
+public class UstarTarFormatter : ITarFormatter
 {
     /// <summary>
     /// Initializes a new instance of the FileTarFormatter class.
     /// </summary>
-    public FileTarFormatter()
+    public UstarTarFormatter()
     {
 
     }

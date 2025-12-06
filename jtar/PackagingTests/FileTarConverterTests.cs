@@ -18,7 +18,7 @@ public class FileTarFormatterTests
     [TestMethod]
     public void FormatTar_ReturnsCorrectTotalLength()
     {
-        var formatter = new FileTarFormatter();
+        var formatter = new UstarTarFormatter();
         byte[] fileData = { 1, 2, 3 };
         string path = CreateTempFile(fileData, DateTime.Now);
 
@@ -34,7 +34,7 @@ public class FileTarFormatterTests
     [TestMethod]
     public void FormatTar_CopiesFileContentCorrectly()
     {
-        var formatter = new FileTarFormatter();
+        var formatter = new UstarTarFormatter();
         byte[] fileData = Encoding.ASCII.GetBytes("HELLO");
         string path = CreateTempFile(fileData, DateTime.Now);
 
@@ -49,7 +49,7 @@ public class FileTarFormatterTests
     [TestMethod]
     public void FormatTar_WritesCorrectSizeFieldInHeader()
     {
-        var formatter = new FileTarFormatter();
+        var formatter = new UstarTarFormatter();
         byte[] fileData = new byte[1234];
         string path = CreateTempFile(fileData, DateTime.Now);
 
@@ -64,7 +64,7 @@ public class FileTarFormatterTests
     [TestMethod]
     public void FormatTar_ComputesCorrectChecksum()
     {
-        var formatter = new FileTarFormatter();
+        var formatter = new UstarTarFormatter();
 
         byte[] content = new byte[] { 10, 20, 30, 40 };
         string path = CreateTempFile(content, DateTime.Now);
@@ -94,7 +94,7 @@ public class FileTarFormatterTests
     [TestMethod]
     public void FormatTar_WritesFileNameCorrectly()
     {
-        var formatter = new FileTarFormatter();
+        var formatter = new UstarTarFormatter();
 
         byte[] data = { 1, 2, 3 };
         string path = CreateTempFile(data, DateTime.Now);

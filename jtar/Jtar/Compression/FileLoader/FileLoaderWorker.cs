@@ -14,12 +14,12 @@ public class FileLoaderWorker
     private const long MAX_CHUNK_SIZE_BYTES = 128 * 1024; // 128 KB (limit set by the zstd specification)
 
     private readonly BlockingCollection<string> _filepaths;
-    private readonly FileTarFormatter _fileTarFormatter;
+    private readonly ITarFormatter _tarFormatter;
     private readonly BlockingCollection<Chunk> _outputCollection;
-    public FileLoaderWorker(BlockingCollection<string> filepaths, BlockingCollection<Chunk> outputCollection)
+    public FileLoaderWorker(BlockingCollection<string> filepaths, BlockingCollection<Chunk> outputCollection, ITarFormatter? tarFormatter = null)
     {
         _filepaths = filepaths;
-        _fileTarFormatter = new FileTarFormatter();
+        _tarFormatter = tarFormatter ?? new PaxTarFormatter();
         _outputCollection = outputCollection;
     }
 
@@ -38,7 +38,7 @@ public class FileLoaderWorker
                 byte[] data;
                 try
                 {
-                    data = _fileTarFormatter.FormatTar(filepath, ".");
+                    data = _tarFormatter.FormatTar(filepath, ".");
                 }
                 catch (PathTooLongException)
                 {

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Jtar.Compression;
 using Jtar.Compression.Compressor;
+using Jtar.Compression.FileLoader;
 using Jtar.Exceptions;
 using Jtar.Logging;
 
@@ -44,6 +45,12 @@ class Program
         };
         rootCommand.Options.Add(noCompressionOption);
 
+        var ustarOption = new Option<bool>("--ustar", "-u")
+        {
+            Description = "Uses USTAR TAR format"
+        };
+        rootCommand.Options.Add(ustarOption);
+
         ParseResult parseResult = rootCommand.Parse(args);
         if (parseResult.Errors.Count == 0 && parseResult.GetValue(fileArgument) is IEnumerable<string> files)
         {
@@ -82,6 +89,18 @@ class Program
                 compressor = new NoCompressor();
             }
             builder.SetCompressor(compressor);
+
+            var isUstar = parseResult.GetValue(ustarOption);
+            ITarFormatter tarFormatter;
+            if (isUstar)
+            {
+                tarFormatter = new UstarTarFormatter();
+            }
+            else
+            {
+                tarFormatter = new PaxTarFormatter();
+            }
+            builder.SetTarFormatter(tarFormatter);
 
             var argOutputName = parseResult.GetValue(outputFileOption);
             if (argOutputName != null && argOutputName != string.Empty) outputName = argOutputName;

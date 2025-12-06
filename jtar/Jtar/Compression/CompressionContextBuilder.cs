@@ -1,4 +1,5 @@
 using Jtar.Compression.Compressor;
+using Jtar.Compression.FileLoader;
 
 namespace Jtar.Compression;
 
@@ -8,6 +9,7 @@ public class CompressionContextBuilder
     private IEnumerable<string> _inputFiles = Array.Empty<string>();
     private string _outputFile = "output.tar.zstd";
     private ICompressor _compressor = new NoCompressor();
+    private ITarFormatter _tarFormatter = new PaxTarFormatter();
 
     public CompressionContextBuilder SetThreadCount(int threadCount)
     {
@@ -33,8 +35,14 @@ public class CompressionContextBuilder
         return this;
     }
 
+    public CompressionContextBuilder SetTarFormatter(ITarFormatter tarFormatter)
+    {
+        _tarFormatter = tarFormatter;
+        return this;
+    }
+
     public CompressionContext Build()
     {
-        return new CompressionContext(_threadCount, _inputFiles, _outputFile, _compressor);
+        return new CompressionContext(_threadCount, _inputFiles, _outputFile, _compressor, _tarFormatter);
     }
 }
